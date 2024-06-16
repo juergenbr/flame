@@ -23,6 +23,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: List Workspace Files
+        run: ls -la
+
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v2
         with:
