@@ -12,26 +12,26 @@ import { getApps, getCategories } from '.';
 
 export const login =
   (formData: { password: string; duration: string }) =>
-  async (dispatch: Dispatch<LoginAction>) => {
-    try {
-      const res = await axios.post<ApiResponse<{ token: string }>>(
-        '/api/auth',
-        formData
-      );
+    async (dispatch: Dispatch<LoginAction>) => {
+      try {
+        const res = await axios.post<ApiResponse<{ token: string }>>(
+          '/api/auth',
+          formData
+        );
 
-      localStorage.setItem('token', res.data.data.token);
+        localStorage.setItem('token', res.data.data.token);
 
-      dispatch({
-        type: ActionType.login,
-        payload: res.data.data.token,
-      });
+        dispatch({
+          type: ActionType.login,
+          payload: res.data.data.token,
+        });
 
-      dispatch<any>(getApps());
-      dispatch<any>(getCategories());
-    } catch (err) {
-      dispatch<any>(authError(err, true));
-    }
-  };
+        dispatch<any>(getApps());
+        dispatch<any>(getCategories());
+      } catch (err) {
+        dispatch<any>(authError(err, true));
+      }
+    };
 
 export const logout = () => (dispatch: Dispatch<LogoutAction>) => {
   localStorage.removeItem('token');
@@ -65,21 +65,25 @@ export const autoLogin = () => async (dispatch: Dispatch<AutoLoginAction>) => {
   }
 };
 
+interface ApiErrorResponse {
+  error: string;
+}
+
 export const authError =
   (error: unknown, showNotification: boolean) =>
-  (dispatch: Dispatch<AuthErrorAction>) => {
-    const apiError = error as AxiosError;
+    (dispatch: Dispatch<AuthErrorAction>) => {
+      const apiError = error as AxiosError<ApiErrorResponse>;
 
-    if (showNotification) {
-      dispatch<any>({
-        type: ActionType.createNotification,
-        payload: {
-          title: 'Error',
-          message: apiError.response?.data.error,
-        },
-      });
-    }
+      if (showNotification && apiError.response?.data?.error) {
+        dispatch<any>({
+          type: ActionType.createNotification,
+          payload: {
+            title: 'Error',
+            message: apiError.response.data.error,
+          },
+        });
+      }
 
-    dispatch<any>(getApps());
-    dispatch<any>(getCategories());
-  };
+      dispatch<any>(getApps());
+      dispatch<any>(getCategories());
+    };
