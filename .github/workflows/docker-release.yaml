@@ -35,4 +35,4 @@ jobs:
             context: .
             file: ./.docker/Dockerfile
             push: true
-            tags: jbreitenbaumer/flame:latest
+            tags: ghcr.io/juergenbr/flame:latest
